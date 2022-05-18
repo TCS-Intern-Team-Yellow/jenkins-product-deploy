@@ -1,0 +1,36 @@
+pipeline {
+    agent any 
+    environment {
+        registry = "js194/productservice"
+        registryCredential = 'f2863298-cc59-439b-a4f4-402e5539b2ab'
+        dockerImage = ''
+    }
+    
+    stages {
+        stage('Cloning Git') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/20220504']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/TCS-Intern-Team-Yellow/product.git']]])     
+            }
+        }
+    
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build registry
+        }
+      }
+    }
+    
+     // Uploading Docker images into Docker Hub
+    stage('Upload Image') {
+     steps{    
+         script {
+            docker.withRegistry( '', registryCredential ) {
+            sh 'whoami'
+            dockerImage.push()
+            }
+        }
+      }
+    }
+  }
+}
