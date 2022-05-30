@@ -1,3 +1,5 @@
+properties([pipelineTriggers([githubPush()])])
+
 pipeline {
     agent any 
     environment {
@@ -7,6 +9,18 @@ pipeline {
     }
     
     stages {
+         stage('Checkout SCM') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                  branches: [[name: 'master']],
+                  userRemoteConfigs: [[
+                    url: 'https://github.com/TCS-Intern-Team-Yellow/product.git',
+                    credentialsId: 'TCSYellowGithubSSHAccessToken',
+                  ]]
+                 ])
+           }
+        }
         stage('Cloning Git') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/20220504']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/TCS-Intern-Team-Yellow/product.git']]])     
